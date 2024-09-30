@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(63, 136, 134, 0.2);
+}
+
+/* Bill Card Styles */
+.billing-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the logo and info */
+    padding: 25px;
+    margin: 15px 0;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    max-width: 600px; /* Constrain max width */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.billing-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.account-header-box {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* Always top-left corner */
+    background-color: #fff;
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.account-logo {
+    width: 60px; /* Increased logo size */
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.billing-info {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.billing-info h3 {
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.billing-info .due-date {
+    margin: 0;
+    font-size: 1rem; /* Increased due date font size */
+    color: #666;
+}
+
+.account-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Ensure full width for buttons */
+    margin-top: 15px;
+    gap: 10px; /* Add gap between buttons */
+}
+
+.btn {
+    padding: 12px 20px; /* Slightly larger buttons */
+    font-size: 1rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1; /* Allow buttons to evenly share the available space */
+    text-align: center;
+}
+
+.btn-pay {
+    background-color: #37B7C3;
+    color: #fff;
+}
+
+.btn-pay:hover {
+    background-color: #077687;
+}
+
+.btn-schedule {
+    background-color: #071952;
+    color: #fff;
+}
+
+.btn-schedule:hover {
+    background-color: #2a2d30;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    .billing-card {
+        flex-direction: column;
+        align-items: center; /* Ensure everything else is centered */
+    }
+
+    .billing-card img {
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .account-header-box {
+        position: absolute; 
+        top: 10px; 
+        left: 10px; /* Keep it in the top-left corner on mobile */
+        transform: none; 
+        margin-bottom: 15px;
+    }
+
+    .account-buttons {
+        flex-direction: row; /* Ensure buttons remain side by side */
+        justify-content: space-between;
+        width: 100%; /* Ensure full width */
+        gap: 10px; /* Add some gap between buttons */
+    }
+
+    .btn {
+        width: 100%; /* Keep buttons equal width and side by side */
+        margin-bottom: 0;
+    }
+}

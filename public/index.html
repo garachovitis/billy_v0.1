@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEI, Cosmote, ΔΕΥΑΠ</title>
+    <link rel="stylesheet" href="index.css"> <!-- Σύνδεση με το αρχείο CSS -->
+</head>
+<body>
+    <header>
+        <h1>Billy</h1>
+    </header>
+
+    <div class="container">
+        <div class="menu">
+            <button class="cosmote-btn" onclick="showForm('cosmote')">Cosmote</button>
+            <button class="dei-btn" onclick="showForm('dei')">ΔΕΗ</button>
+            <button class="deyap-btn" onclick="showForm('deyap')">ΔΕΥΑΠ</button> <!-- Νέο κουμπί ΔΕΥΑΠ -->
+        </div>
+
+        <!-- Cosmote Form -->
+        <div id="cosmote-form" class="form-container">
+            <img src="/icons/cosmote.png" alt="Cosmote Logo" class="logo">
+            <h2>Login to Cosmote</h2>
+            <form id="cosmoteLoginForm">
+                <input type="text" id="cosmote-username" placeholder="Enter your Cosmote username" required>
+                <input type="password" id="cosmote-password" placeholder="Enter your Cosmote password" required>
+            </form>
+        </div>
+
+        <!-- DEI Form -->
+        <div id="dei-form" class="form-container">
+            <img src="/icons/dei.png" alt="DEI Logo" class="logo">
+            <h2>Login to ΔΕΗ</h2>
+            <form id="deiLoginForm">
+                <input type="text" id="dei-username" placeholder="Enter your DEI username" required>
+                <input type="password" id="dei-password" placeholder="Enter your DEI password" required>
+            </form>
+        </div>
+
+        <!-- ΔΕΥΑΠ Form -->
+        <div id="deyap-form" class="form-container">
+            <img src="/icons/deyap.png" alt="ΔΕΥΑΠ Logo" class="logo">
+            <h2>Login to ΔΕΥΑΠ</h2>
+            <form id="deyapLoginForm">
+                <input type="text" id="deyap-username" placeholder="Enter your ΔΕΥΑΠ username" required>
+                <input type="password" id="deyap-password" placeholder="Enter your ΔΕΥΑΠ password" required>
+            </form>
+        </div>
+
+        <button type="submit" onclick="submitForm()">Submit</button>
+
+        <div class="results" id="results"></div>
+        <button onclick="goHome()">Home</button>
+    </div>
+
+    <script>
+        let currentForm = '';
+
+        // Function to toggle between Cosmote, DEI, and ΔΕΥΑΠ forms
+        function showForm(service) {
+            document.getElementById('cosmote-form').style.display = 'none';
+            document.getElementById('dei-form').style.display = 'none';
+            document.getElementById('deyap-form').style.display = 'none'; // Κρύβουμε τη φόρμα ΔΕΥΑΠ
+
+            if (service === 'cosmote') {
+                document.getElementById('cosmote-form').style.display = 'block';
+                currentForm = 'cosmote';
+            } else if (service === 'dei') {
+                document.getElementById('dei-form').style.display = 'block';
+                currentForm = 'dei';
+            } else if (service === 'deyap') {
+                document.getElementById('deyap-form').style.display = 'block';
+                currentForm = 'deyap';
+            }
+        }
+
+        // Form submission logic
+        function submitForm() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p class="loading">Loading...</p>';
+
+            let username, password;
+
+            if (currentForm === 'cosmote') {
+                username = document.getElementById('cosmote-username').value;
+                password = document.getElementById('cosmote-password').value;
+            } else if (currentForm === 'dei') {
+                username = document.getElementById('dei-username').value;
+                password = document.getElementById('dei-password').value;
+            } else if (currentForm === 'deyap') {
+                username = document.getElementById('deyap-username').value;
+                password = document.getElementById('deyap-password').value;
+            }
+
+            if (username && password) {
+                fetch('http://localhost:321/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, service: currentForm })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        if (currentForm === 'cosmote') {
+                            resultsDiv.innerHTML = '<p>Η σύνδεση στο myCosmote ολοκληρώθηκε</p>';
+                        } else if (currentForm === 'dei') {
+                            resultsDiv.innerHTML = '<p>Η σύνδεση στο myDEI ολοκληρώθηκε</p>';
+                        } else if (currentForm === 'deyap') {
+                            resultsDiv.innerHTML = '<p>Η σύνδεση στο myΔΕΥΑΠ ολοκληρώθηκε</p>';
+                        }
+                    } else {
+                        resultsDiv.innerHTML = `<p class="error">Error: ${result.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                });
+            } else {
+                resultsDiv.innerHTML = '<p class="error">Please enter username and password</p>';
+            }
+        }
+
+        // Redirect to stoixeia.html when home button is clicked
+        function goHome() {
+            window.location.href = 'stoixeia.html';
+        }
+    </script>
+</body>
+</html>

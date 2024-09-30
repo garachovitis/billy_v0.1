@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Info</title>
+    <link rel="stylesheet" href="stoixeia.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Billing Info</h1>
+        
+        <!-- Cosmote Section -->
+        <div id="cosmote-section" class="service-section">
+            <h2>Cosmote Billing</h2>
+            <div id="cosmote-billing-container"></div>
+        </div>
+
+        <!-- DEI Section -->
+        <div id="dei-section" class="service-section">
+            <h2>DEI Billing</h2>
+            <div id="dei-billing-container"></div>
+        </div>
+
+        <!-- ΔΕΥΑΠ Section -->
+        <div id="deyap-section" class="service-section">
+            <h2>ΔΕΥΑΠ Billing</h2>
+            <div id="deyap-billing-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Define the logos with correct paths relative to the public folder
+        const billLogos = {
+            'Cosmote': '/icons/cosmote.png',  // Update the path to the actual logos in the public folder
+            'DEI': '/icons/dei.png',          // Update the path to the actual logos in the public folder
+            'ΔΕΥΑΠ': '/icons/deyap.png'       // Λογότυπο της ΔΕΥΑΠ
+        };
+
+        // Function to format amount with two decimal places (ensures XX.90 or XX.00)
+        function formatAmount(amount) {
+            return parseFloat(amount).toFixed(2);
+        }
+
+        // Function to display only the connection number as is (without any prefix) for Cosmote
+        function formatConnection(connection) {
+            return connection ? connection : "No data";
+        }
+
+        // Function to display the address for DEI and ΔΕΥΑΠ
+        function formatAddress(address) {
+            return address ? address : "No data";
+        }
+
+        // Fetch billing data from backend
+        fetch('http://localhost:321/billing-info')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Data fetched from server:', result);
+
+                if (result.status === 'success') {
+                    const data = result.data;
+
+                    // Parse and display the billing data
+                    data.forEach(item => {
+                        if (item.service === 'cosmote') {
+                            displayCosmoteData(JSON.parse(item.data));
+                        } else if (item.service === 'dei') {
+                            displayDEIData(JSON.parse(item.data));
+                        } else if (item.service === 'deyap') {
+                            displayDeyapData(JSON.parse(item.data));
+                        }
+                    });
+                } else {
+                    alert('No billing info available');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+        // Function to display Cosmote data in card format
+        function displayCosmoteData(data) {
+            const container = document.getElementById('cosmote-billing-container');
+            data.forEach(bill => {
+                const card = document.createElement('div');
+                card.className = 'billing-card';
+
+                card.innerHTML = `
+                    <div class="account-header-box">
+                        <span>${formatConnection(bill.connection)}</span>
+                    </div>
+                    <img src="${billLogos['Cosmote']}" alt="Cosmote Logo" class="account-logo">
+                    <div class="billing-info">
+                        <h3>${formatAmount(bill.totalAmount)}€</h3>
+                        <p class="due-date">Λήξη: ${bill.dueDate || 'No data'}</p>
+                    </div>
+                    <div class="account-buttons">
+                        <button class="btn btn-pay">Pay</button>
+                        <button class="btn btn-schedule">Schedule</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Function to display DEI data in card format
+        function displayDEIData(data) {
+            const container = document.getElementById('dei-billing-container');
+            const card = document.createElement('div');
+            card.className = 'billing-card';
+
+            card.innerHTML = `
+                <div class="account-header-box">
+                    <span>${formatAddress(data.address)}</span>
+                </div>
+                <img src="${billLogos['DEI']}" alt="DEI Logo" class="account-logo">
+                <div class="billing-info">
+                    <h3>${formatAmount(data.paymentAmount)}€</h3>
+                    <p class="due-date">Λήξη: ${data.dueDate || 'No data'}</p>
+                </div>
+                <div class="account-buttons">
+                    <button class="btn btn-pay">Pay</button>
+                    <button class="btn btn-schedule">Schedule</button>
+                </div>
+            `;
+
+            container.appendChild(card);
+        }
+
+        // Function to display ΔΕΥΑΠ data in card format
+        function displayDeyapData(data) {
+            const container = document.getElementById('deyap-billing-container');
+            const card = document.createElement('div');
+            card.className = 'billing-card';
+
+            card.innerHTML = `
+                <div class="account-header-box">
+                    <span>${formatAddress(data.address)}</span>
+                </div>
+                <img src="${billLogos['ΔΕΥΑΠ']}" alt="ΔΕΥΑΠ Logo" class="account-logo">
+                <div class="billing-info">
+                    <h3>${formatAmount(data.balance)}€</h3>
+                    <p class="due-date">Κατάσταση: ${data.status || 'No data'}</p>
+                </div>
+                <div class="account-buttons">
+                    <button class="btn btn-pay">Pay</button>
+                    <button class="btn btn-schedule">Schedule</button>
+                </div>
+            `;
+
+            container.appendChild(card);
+        }
+    </script>
+</body>
+</html>
