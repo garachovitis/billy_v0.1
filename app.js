@@ -1,7 +1,7 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
-const Database = require('better-sqlite3'); // SQLite database
+const sqlite3 = require('sqlite3').verbose(); // Χρήση του sqlite3 για σύνδεση με τη βάση δεδομένων
 const bcrypt = require('bcryptjs'); // Βιβλιοθήκη για κρυπτογράφηση
 
 const app = express();
@@ -9,15 +9,22 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
-// Δημιουργία ή σύνδεση με τη βάση δεδομένων SQLite
-const db = new Database(':memory:'); // Use better-sqlite3, no callback needed for memory DB
-db.exec(`CREATE TABLE IF NOT EXISTS billing_info (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    service TEXT,
-    username TEXT,
-    password TEXT,
-    data TEXT
-)`);
+// Δημιουργία ή σύνδεση με τη βάση δεδομένων SQLite σε αρχείο "webscrDB.sqlite"
+const db = new sqlite3.Database('./webscrDB.sqlite', (err) => {
+    if (err) {
+        console.error('Error opening database:', err.message);
+    } else {
+        console.log('Connected to SQLite database.');
+        // Δημιουργία πίνακα για τα στοιχεία των χρηστών, αν δεν υπάρχει ήδη
+        db.run(`CREATE TABLE IF NOT EXISTS billing_info (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            service TEXT,
+            username TEXT,
+            password TEXT,
+            data TEXT
+        )`);
+    }
+});
 
 // Helper function για αποθήκευση δεδομένων στη βάση
 async function saveBillingData(service, username, password, newData) {
@@ -25,20 +32,28 @@ async function saveBillingData(service, username, password, newData) {
         // Κρυπτογράφηση του κωδικού
         const hashedPassword = await bcrypt.hash(password, 10); // Κρυπτογράφηση με επίπεδο ασφαλείας 10
 
-        // Έλεγχος αν υπάρχει ήδη εγγραφή με το ίδιο dueDate και paymentAmount
-        const queryCheck = `SELECT * FROM billing_info WHERE service = ? AND data LIKE ?`;
         const newDueDate = newData.dueDate;
         const newPaymentAmount = newData.paymentAmount;
 
-        const row = db.prepare(queryCheck).get(service, `%${newDueDate}%${newPaymentAmount}%`);
-        if (row) {
-            console.log(`Entry already exists for service: ${service} with dueDate: ${newDueDate} and paymentAmount: ${newPaymentAmount}`);
-        } else {
-            // Αν δεν υπάρχει ήδη, αποθήκευση των νέων δεδομένων
-            const queryInsert = `INSERT INTO billing_info (service, username, password, data) VALUES (?, ?, ?, ?)`;
-            db.prepare(queryInsert).run(service, username, hashedPassword, JSON.stringify(newData));
-            console.log(`Saved data for ${service} - Username: ${username}`);
-        }
+        // Έλεγχος αν υπάρχει ήδη εγγραφή με το ίδιο dueDate και paymentAmount
+        const queryCheck = `SELECT * FROM billing_info WHERE service = ? AND data LIKE ?`;
+        db.get(queryCheck, [service, `%${newDueDate}%${newPaymentAmount}%`], (err, row) => {
+            if (err) {
+                console.error('Error checking data:', err.message);
+            } else if (row) {
+                console.log(`Entry already exists for service: ${service} with dueDate: ${newDueDate} and paymentAmount: ${newPaymentAmount}`);
+            } else {
+                // Αν δεν υπάρχει ήδη, αποθήκευση των νέων δεδομένων
+                const queryInsert = `INSERT INTO billing_info (service, username, password, data) VALUES (?, ?, ?, ?)`;
+                db.run(queryInsert, [service, username, hashedPassword, JSON.stringify(newData)], function (err) {
+                    if (err) {
+                        console.error('Error inserting data:', err.message);
+                    } else {
+                        console.log(`Saved data for ${service} - Username: ${username}`);
+                    }
+                });
+            }
+        });
 
     } catch (error) {
         console.error('Error hashing password:', error.message);
@@ -48,13 +63,14 @@ async function saveBillingData(service, username, password, newData) {
 // Helper function για ανάκτηση δεδομένων από τη βάση
 function getBillingData(callback) {
     const query = `SELECT service, username, data FROM billing_info`;
-    try {
-        const rows = db.prepare(query).all();
-        callback(null, rows);
-    } catch (err) {
-        console.error('Error fetching data:', err.message);
-        callback(err, null);
-    }
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching data:', err.message);
+            callback(err, null);
+        } else {
+            callback(null, rows);
+        }
+    });
 }
 
 // Helper function για scraping DEI

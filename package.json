@@ -13,10 +13,10 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.3.0",
     "cors": "^2.8.5",
     "express": "^4.21.0",
-    "puppeteer": "^23.4.1"
+    "puppeteer": "^23.4.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
