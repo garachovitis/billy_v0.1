@@ -306,8 +306,7 @@ app.get('/billing-info', (req, res) => {
     });
 });
 
-// Εκκίνηση του server
-const PORT = 321;
+const PORT = process.env.PORT || 321; // Χρήση δυναμικής θύρας ή fallback στη θύρα 321 αν δεν υπάρχει η μεταβλητή περιβάλλοντος
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
