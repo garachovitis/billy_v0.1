@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npx puppeteer install"},
   "keywords": [],
   "author": "Your Name",
   "license": "ISC",
@@ -22,6 +22,6 @@
     "nodemon": "^3.1.7"
   },
   "engines": {
-    "node": "=18.0.0"
-  } 
+    "node": ">=18.0.0"
+  }
 }
