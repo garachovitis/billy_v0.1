@@ -86,7 +86,8 @@ async function scrapeDEI(username, password) {
                 '--disable-blink-features=AutomationControlled',
                 '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
             ],
-        });
+            executablePath: process.env.CHROME_BIN || null // Προσθήκη διαδρομής για το εκτελέσιμο Chrome στο Render
+        })
         const page = await browser.newPage();
 
         // Μετάβαση στη σελίδα login της ΔΕΗ
@@ -149,6 +150,7 @@ async function scrapeCosmote(username, password) {
                 '--disable-blink-features=AutomationControlled',
                 '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
             ],
+            executablePath: process.env.CHROME_BIN || null // Προσθήκη διαδρομής για το εκτελέσιμο Chrome στο Render
         });
         const page = await browser.newPage();
 
@@ -226,7 +228,8 @@ async function scrapeDeyap(username, password) {
                 '--disable-blink-features=AutomationControlled',
                 '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
             ],
-        });
+            executablePath: process.env.CHROME_BIN || null // Προσθήκη διαδρομής για το εκτελέσιμο Chrome στο Render
+        })
         const page = await browser.newPage();
 
         // Βήμα 1: Μετάβαση στη σελίδα login της ΔΕΥΑΠ
